@@ -38,7 +38,7 @@ echo "\n";
 --EXPECT--
 abc,def,ghi
 I am in foo()...
-11
+0
 I am in bar()...
 Test for 'include_once' & 'require_once' operation
 main()                                  : ct=       1; wt=*;
@@ -54,4 +54,4 @@ run_init::tests/xhprof_004_inc.php==>implode: ct=       1; wt=*;
 run_init::tests/xhprof_004_require.php==>bar: ct=       1; wt=*;
 run_init::tests/xhprof_004_require.php==>explode: ct=       1; wt=*;
 run_init::tests/xhprof_004_require.php==>implode: ct=       1; wt=*;
-run_init::tests/xhprof_004_require.php==>strlen: ct=       1; wt=*;
+run_init::tests/xhprof_004_require.php==>strcmp: ct=       1; wt=*;

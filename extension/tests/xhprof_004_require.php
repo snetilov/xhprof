@@ -17,7 +17,7 @@ $result1 = explode(" ", "abc def ghi");
 
 $result2 = implode(",", $result1);
 
-$result3 = strlen($result2);
+$result3 = strcmp($result2, "abc,def,ghi");
 
 echo $result3 . "\n";
 
