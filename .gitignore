@@ -5,10 +5,12 @@ extension/*
 !extension/xhprof.c
 
 !extension/tests/
+!extension/tests/common.php
+!extension/tests/xhprof_004_inc.php
+!extension/tests/xhprof_004_require.php
 extension/tests/*.sh
 extension/tests/*.exp
 extension/tests/*.out
 extension/tests/*.diff
 extension/tests/*.log
 extension/tests/*.php
-
