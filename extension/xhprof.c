@@ -1474,17 +1474,17 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
   func = execute_data->func->internal_function.function_name;
   /* check if was in a class */ 
   if (execute_data ->called_scope != NULL && func != NULL) {
-  	//this is a class method;
-	zend_string *class_name = execute_data->called_scope->name;
-	zend_string *func_name = func;
+    //this is a class method;
+    zend_string *class_name = execute_data->called_scope->name;
+    zend_string *func_name = func;
 
-	int class_name_len = class_name->len;
-	func = zend_string_init(class_name->val, class_name_len + 2 + func_name->len, 0); 
-	memcpy(func->val + class_name_len, "::", 2);
-	memcpy(func->val + class_name_len + 2, func_name->val, func_name->len);
+    int class_name_len = class_name->len;
+    func = zend_string_init(class_name->val, class_name_len + 2 + func_name->len, 0); 
+    memcpy(func->val + class_name_len, "::", 2);
+    memcpy(func->val + class_name_len + 2, func_name->val, func_name->len);
   } else if (func) {
-	//just do the copy;
-	func = zend_string_init(func->val, func->len, 0);
+    //just do the copy;
+    func = zend_string_init(func->val, func->len, 0);
   } else if (execute_data->literals->u1.type_info == 4) {
     
     //could include, not sure others has the same value
@@ -1492,13 +1492,13 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
     zend_string *filename = execute_data->func->op_array.filename;
 
     int run_init_len = sizeof("run_init::") - 1;
- 	func = zend_string_init("run_init::", run_init_len + filename->len, 0); 
-	memcpy(func->val + run_init_len, filename->val, filename->len);
+    func = zend_string_init("run_init::", run_init_len + filename->len, 0); 
+    memcpy(func->val + run_init_len, filename->val, filename->len);
   }
 
   if (!func || hp_globals.enabled == 0) {
     if (func) zend_string_free(func);
-	_zend_execute_ex(execute_data TSRMLS_CC);
+      _zend_execute_ex(execute_data TSRMLS_CC);
     return;
   }
 
@@ -1508,8 +1508,7 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
     END_PROFILING(&hp_globals.entries, hp_profile_flag);
   }
   if (func) {
-  
-  	zend_string_free(func);
+    zend_string_free(func);
   }
 }
 
@@ -1531,20 +1530,36 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data, zval *re
   int    hp_profile_flag = 1;
 
   current_data = EG(current_execute_data);
+  
+  if (hp_globals.xhprof_flags & XHPROF_FLAGS_NO_BUILTINS) {
+    /* if NO_BUILTINS is not set (i.e. user wants to profile builtins),
+     * then we intercept internal (builtin) function calls.
+     */
+    if (!_zend_execute_internal) {
+      /* no old override to begin with. so invoke the builtin's implementation  */
+
+      //zend_op *opline = EX(opline);
+      return execute_data ->func ->internal_function.handler(execute_data, ret);
+    } else {
+      /* call the old override */
+      return _zend_execute_internal(execute_data, ret TSRMLS_CC);
+    }
+  }
+  
   func = current_data->func->op_array.function_name ;
 
   //check is a class method
   if(current_data->func->op_array.scope != NULL) {
-	  zend_string *class_name = current_data->func->op_array.scope->name;
-	  zend_string *func_name = func;
+    zend_string *class_name = current_data->func->op_array.scope->name;
+    zend_string *func_name = func;
 
-	  int class_name_len = class_name->len;
-	  func = zend_string_init(class_name->val, class_name_len + 2 + func_name->len, 0); 
-	  memcpy(func->val + class_name_len, "::", 2);
-	  memcpy(func->val + class_name_len + 2, func_name->val, func_name->len);
+    int class_name_len = class_name->len;
+    func = zend_string_init(class_name->val, class_name_len + 2 + func_name->len, 0); 
+    memcpy(func->val + class_name_len, "::", 2);
+    memcpy(func->val + class_name_len + 2, func_name->val, func_name->len);
   } else {
-	  //just do the copy;
-	  func = zend_string_init(func->val, func->len, 0);
+    //just do the copy;
+    func = zend_string_init(func->val, func->len, 0);
   }
 
   if (func && strcmp("xhprof_enable", func->val) != 0) {
@@ -1572,7 +1587,7 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data, zval *re
   }
 
   if (func) {
-	  zend_string_free(func);
+    zend_string_free(func);
   }
 
 }
@@ -1589,7 +1604,7 @@ ZEND_DLEXPORT zend_op_array* hp_compile_file(zend_file_handle *file_handle,
   int             len;
   zend_op_array  *ret;
   int             hp_profile_flag = 1;
-  zend_string	 *func_name;
+  zend_string    *func_name;
 
   filename = hp_get_base_filename(file_handle->filename);
   len      = strlen("load::") + strlen(filename);
@@ -1661,7 +1676,7 @@ static void hp_begin(long level, long xhprof_flags TSRMLS_DC) {
     }
     BEGIN_PROFILING(&hp_globals.entries, zend_string_init(ROOT_SYMBOL, sizeof(ROOT_SYMBOL) - 1, 1), hp_profile_flag);
     return;
-	
+
     /* Replace zend_compile_file with our proxy */
     _zend_compile_file = zend_compile_file;
     zend_compile_file  = hp_compile_file;
