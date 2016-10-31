@@ -78,7 +78,7 @@
  */
 
 /* XHProf version                           */
-#define XHPROF_VERSION       "0.9.2"
+#define XHPROF_VERSION       "0.9.5"
 
 /* Fictitious function name to represent top of the call tree. The paranthesis
  * in the name is to ensure we don't conflict with user function names.  */
@@ -1395,6 +1395,12 @@ zval * hp_mode_shared_endfn_cb(hp_entry_t *top,
 
   hp_inc_count(countsp, zend_string_init("wt", sizeof("wt") - 1, 1), get_us_from_tsc(tsc_end - top->tsc_start,
         hp_globals.cpu_frequencies[hp_globals.cur_cpu_id]) TSRMLS_CC);
+  
+  // This is a dirty hack
+  // TODO: replace with something more efficient
+  ht = HASH_OF(hp_globals.stats_count);
+  countsp = zend_hash_str_find(ht, symbol->val, strlen(symbol->val));
+  
   return countsp;
 }
 
@@ -1421,7 +1427,7 @@ void hp_mode_hier_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
     return;
   }
   zend_string_free(symbol);
-  return;
+  
   if (hp_globals.xhprof_flags & XHPROF_FLAGS_CPU) {
     /* Get CPU usage */
     getrusage(RUSAGE_SELF, &ru_end);
