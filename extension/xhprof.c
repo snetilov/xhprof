@@ -1485,12 +1485,16 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
   } else if (func) {
     //just do the copy;
     func = zend_string_init(func->val, func->len, 0);
-  } else if (execute_data->literals->u1.type_info == 4) {
+  } else if (execute_data->literals->u1.type_info == 6) {
     
     //could include, not sure others has the same value
     //This is fucking dam ugly
     zend_string *filename = execute_data->func->op_array.filename;
-
+    
+    const char *base_filename = hp_get_base_filename(filename->val);
+    
+    filename = zend_string_init(base_filename, strlen(base_filename), 0);
+    
     int run_init_len = sizeof("run_init::") - 1;
     func = zend_string_init("run_init::", run_init_len + filename->len, 0); 
     memcpy(func->val + run_init_len, filename->val, filename->len);
