@@ -225,7 +225,7 @@ typedef struct hp_global_t {
   uint8  func_hash_counters[256];
 
   /* Table of ignored function names and their filter */
-  char  **ignored_function_names;
+  HashTable *ignored_function_names;
   uint8   ignored_function_filter[XHPROF_IGNORED_FUNCTION_FILTER_SIZE];
 
 } hp_global_t;
@@ -306,8 +306,8 @@ static void hp_ignored_functions_filter_init();
 
 static inline zval  *hp_zval_at_key(char  *key,
                                     zval  *values);
-static inline char **hp_strings_in_zval(zval  *values);
-static inline void   hp_array_del(char **name_array);
+//static inline char **hp_strings_in_zval(zval  *values);
+//static inline void   hp_array_del(char **name_array);
 
 /* {{{ arginfo */
 ZEND_BEGIN_ARG_INFO_EX(arginfo_xhprof_enable, 0, 0, 0)
@@ -396,7 +396,7 @@ PHP_FUNCTION(xhprof_enable) {
     return;
   }
 
-  //hp_get_ignored_functions_from_arg(optional_array);
+  hp_get_ignored_functions_from_arg(optional_array);
 
   hp_begin(XHPROF_MODE_HIERARCHICAL, xhprof_flags TSRMLS_CC);
 }
@@ -607,19 +607,21 @@ static inline uint8 hp_inline_hash(char * str) {
  * @author mpal
  */
 static void hp_get_ignored_functions_from_arg(zval *args) {
-//
-//  if (hp_globals.ignored_function_names) {
-//    hp_array_del(hp_globals.ignored_function_names);
-//  }
-//
-//  if (args != NULL) {
-//    zval  *zresult = NULL;
-//
-//    zresult = hp_zval_at_key("ignored_functions", args);
-//    hp_globals.ignored_function_names = hp_strings_in_zval(zresult);
-//  } else {
-//    hp_globals.ignored_function_names = NULL;
-//  }
+  if (args != NULL) {
+    zval  *zresult = NULL;
+
+    zresult = hp_zval_at_key("ignored_functions", args);
+    if (zresult && Z_TYPE_P(zresult) == IS_ARRAY) {
+      hp_globals.ignored_function_names = Z_ARRVAL_P(zresult);
+    } else if (zresult && Z_TYPE_P(zresult) == IS_STRING) {
+        //zend_hash_init(hp_globals.ignored_function_names, 0, NULL, NULL, 0);
+        //zend_hash_add(hp_globals.ignored_function_names, Z_STR_P(zresult), ZVAL_TRUE(IS_TRUE));
+    } else {
+      //hp_globals.ignored_function_names = NULL;
+    }
+  } else {
+    //hp_globals.ignored_function_names = NULL;
+  }
 }
 
 /**
@@ -638,15 +640,7 @@ static void hp_ignored_functions_filter_clear() {
  * @author mpal
  */
 static void hp_ignored_functions_filter_init() {
-  if (hp_globals.ignored_function_names != NULL) {
-    int i = 0;
-    for(; hp_globals.ignored_function_names[i] != NULL; i++) {
-      char *str  = hp_globals.ignored_function_names[i];
-      uint8 hash = hp_inline_hash(str);
-      int   idx  = INDEX_2_BYTE(hash);
-      hp_globals.ignored_function_filter[idx] |= INDEX_2_BIT(hash);
-    }
-  }
+  //zend_hash_init(hp_globals.ignored_function_names, 0, NULL, NULL, 0);
 }
 
 /**
@@ -722,7 +716,7 @@ void hp_clean_profiler_state(TSRMLS_D) {
 
   /* Delete the array storing ignored function names */
   //hp_array_del(hp_globals.ignored_function_names);
-  hp_globals.ignored_function_names = NULL;
+  //hp_globals.ignored_function_names = NULL;
 }
 
 /*
@@ -736,8 +730,8 @@ void hp_clean_profiler_state(TSRMLS_D) {
 #define BEGIN_PROFILING(entries, symbol, profile_curr)                  \
   do {                                                                  \
     /* Use a hash code to filter most of the string comparisons. */     \
-    uint8 hash_code  = hp_inline_hash(symbol->val);                          \
-    profile_curr = !hp_ignore_entry(hash_code, symbol->val);                 \
+    uint8 hash_code  = hp_inline_hash(symbol->val);                     \
+    profile_curr = !hp_ignore_entry(symbol);                            \
     if (profile_curr) {                                                 \
       hp_entry_t *cur_entry = hp_fast_alloc_hprof_entry();              \
       (cur_entry)->hash_code = hash_code;                               \
@@ -825,26 +819,26 @@ size_t hp_get_entry_name(hp_entry_t  *entry,
  *
  * @author mpal
  */
-int  hp_ignore_entry_work(uint8 hash_code, char *curr_func) {
-  int ignore = 0;
-  if (hp_ignored_functions_filter_collision(hash_code)) {
-    int i = 0;
-    for (; hp_globals.ignored_function_names[i] != NULL; i++) {
-      char *name = hp_globals.ignored_function_names[i];
-      if ( !strcmp(curr_func, name)) {
-        ignore++;
-        break;
-      }
-    }
-  }
+//int  hp_ignore_entry_work(uint8 hash_code, char *curr_func) {
+//  int ignore = 0;
+//  if (hp_ignored_functions_filter_collision(hash_code)) {
+//    int i = 0;
+//    for (; hp_globals.ignored_function_names[i] != NULL; i++) {
+//      char *name = hp_globals.ignored_function_names[i];
+//      if ( !strcmp(curr_func, name)) {
+//        ignore++;
+//        break;
+//      }
+//    }
+//  }
+//
+//  return ignore;
+//}
 
-  return ignore;
-}
-
-static inline int  hp_ignore_entry(uint8 hash_code, char *curr_func) {
+static inline int  hp_ignore_entry(zend_string *curr_func) {
   /* First check if ignoring functions is enabled */
   return hp_globals.ignored_function_names != NULL &&
-         hp_ignore_entry_work(hash_code, curr_func);
+         zend_hash_exists(hp_globals.ignored_function_names, curr_func);
 }
 
 /**
@@ -1770,22 +1764,22 @@ static void hp_stop(TSRMLS_D) {
  **/
 static zval *hp_zval_at_key(char  *key,
                             zval  *values) {
-//  zval *result = NULL;
-//
-//  if (Z_TYPE_P(values) == IS_ARRAY) {
-//    HashTable *ht;
-//    zval     **value;
-//    uint       len = strlen(key) + 1;
-//
-//    ht = Z_ARRVAL_P(values);
-//    if (zend_hash_find(ht, zend_string_init(key, len, 0)) == SUCCESS) {
-//      result = *value;
-//    }
-//  } else {
-//    result = NULL;
-//  }
-//
-//  return result;
+  zval *result = NULL;
+
+  if (Z_TYPE_P(values) == IS_ARRAY) {
+    HashTable *ht;
+    zval      *value;
+    uint      len = strlen(key);
+
+    ht = Z_ARRVAL_P(values);
+    if (value = zend_hash_str_find(ht, key, len)) {
+      result = value;
+    }
+  } else {
+    result = NULL;
+  }
+
+  return result;
 }
 
 /** Convert the PHP array of strings to an emalloced array of strings. Note,
@@ -1793,7 +1787,7 @@ static zval *hp_zval_at_key(char  *key,
  *
  *  @author mpal
  **/
-static char **hp_strings_in_zval(zval  *values) {
+//static char **hp_strings_in_zval(zval  *values) {
 //  char   **result;
 //  size_t   count;
 //  size_t   ix = 0;
@@ -1851,7 +1845,7 @@ static char **hp_strings_in_zval(zval  *values) {
 //  }
 //
 //  return result;
-}
+//}
 
 /* Free this memory at the end of profiling */
 static inline void hp_array_del(char **name_array) {
