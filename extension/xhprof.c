@@ -1608,7 +1608,7 @@ ZEND_DLEXPORT zend_op_array* hp_compile_file(zend_file_handle *file_handle,
   len      = strlen("load::") + strlen(filename);
 
   func_name = zend_string_init(filename, len, 0); 
- 
+  
   snprintf(func_name->val, len + 1, "load::%s", filename);
 
   BEGIN_PROFILING(&hp_globals.entries, func_name, hp_profile_flag);
@@ -1748,6 +1748,7 @@ static void hp_stop(TSRMLS_D) {
 
   /* Stop profiling */
   hp_globals.enabled = 0;
+  hp_globals.ignored_function_names = NULL;
 }
 
 
