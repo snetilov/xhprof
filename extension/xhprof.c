@@ -269,14 +269,19 @@ void hp_mode_dummy_endfn_cb(hp_entry_t **entries   TSRMLS_DC);
 /* Pointer to the original execute function */
 static void (*_zend_execute_ex) (zend_execute_data *execute_data TSRMLS_DC);
 
-/* Pointer to the origianl execute_internal function */
+/* Pointer to the original execute_internal function */
 static void (*_zend_execute_internal) (zend_execute_data *data, zval *ret TSRMLS_DC);
+
+//static void (*_zend_compile_string) (zval *source_string, char *filename);
+
 
 ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data, zval* ret TSRMLS_DC);
 
 ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC);
 
 ZEND_DLEXPORT zend_op_array* hp_compile_file(zend_file_handle *file_handle, int type TSRMLS_DC);
+
+ZEND_DLEXPORT zend_op_array* hp_compile_string(zval *source_string, char *filename TSRMLS_DC);
 /**
  * ****************************
  * STATIC FUNCTION DECLARATIONS
@@ -498,8 +503,8 @@ PHP_RINIT_FUNCTION(xhprof) {
   zend_compile_file  = hp_compile_file;
 
   /* Replace zend_compile_string with our proxy */
-  //_zend_compile_string = zend_compile_string;
-  //zend_compile_string = hp_compile_string;
+  _zend_compile_string = zend_compile_string;
+  zend_compile_string = hp_compile_string;
 
   /* Replace zend_execute with our proxy */
   _zend_execute_ex = zend_execute_ex;
@@ -1626,14 +1631,18 @@ ZEND_DLEXPORT zend_op_array* hp_compile_file(zend_file_handle *file_handle,
  */
 ZEND_DLEXPORT zend_op_array* hp_compile_string(zval *source_string, char *filename TSRMLS_DC) {
 
-    /*char          *func;
+    zend_string          *func;
     int            len;
     zend_op_array *ret;
     int            hp_profile_flag = 1;
 
-    len  = strlen("eval") + strlen(filename) + 3;
-    func = (char *)emalloc(len);
-    snprintf(func, len, "eval::%s", filename);
+    const char     *basename;
+    
+    basename = hp_get_base_filename(filename);
+    
+    len  = strlen("eval") + strlen(basename) + 3;
+    func = zend_string_alloc(len, 0);
+    snprintf(func->val, len, "eval::%s", basename);
 
     BEGIN_PROFILING(&hp_globals.entries, func, hp_profile_flag);
     ret = _zend_compile_string(source_string, filename TSRMLS_CC);
@@ -1642,7 +1651,7 @@ ZEND_DLEXPORT zend_op_array* hp_compile_string(zval *source_string, char *filena
     }
 
     efree(func);
-    return ret;*/
+    return ret;
 }
 
 /**
