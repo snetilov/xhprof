@@ -559,7 +559,8 @@ PHP_RSHUTDOWN_FUNCTION(xhprof) {
   zend_execute_ex       = _zend_execute_ex;
   zend_execute_internal = _zend_execute_internal;
   
-  zend_compile_file = _zend_compile_file; 
+  zend_compile_file = _zend_compile_file;
+  zend_compile_string = _zend_compile_string;
   return SUCCESS;
 }
 
@@ -849,6 +850,7 @@ size_t hp_get_entry_name(hp_entry_t  *entry,
   /* Force null-termination at MAX */
 //  result_buf[result_len - 1] = 0;
   result->val[result->len - 1] = 0;
+  
   return strlen(result->val);
 }
 
@@ -899,7 +901,7 @@ size_t hp_get_function_stack(hp_entry_t *entry,
                              zend_string *result
                              ) {
   size_t         len = 0;
-
+  
   /* End recursion if we dont need deeper levels or we dont have any deeper
    * levels */
   if (!entry->prev_hprof || (level <= 1)) {
@@ -925,15 +927,14 @@ size_t hp_get_function_stack(hp_entry_t *entry,
   if (len) {
     strncat(result->val + len,
             HP_STACK_DELIM,
-            result->len - len);
-    len += HP_STACK_DELIM_LEN;
+            HP_STACK_DELIM_LEN);
   }
 
 # undef     HP_STACK_DELIM_LEN
 # undef     HP_STACK_DELIM
-
+  
   /* Append the current function name */
-  return len + hp_get_entry_name(entry, result);
+  return hp_get_entry_name(entry, result);
 }
 
 /**
@@ -1193,28 +1194,28 @@ void hp_inc_count(zval *counts, zend_string *name, long count TSRMLS_DC) {
  */
 void hp_sample_stack(hp_entry_t  **entries  TSRMLS_DC) {
 
-//  //char symbol[SCRATCH_BUF_LEN * 1000];
-//  zend_string *symbol;
-//  zend_string *key;
-//  symbol = zend_string_alloc(SCRATCH_BUF_LEN * 1000, 0);
-//  key = zend_string_alloc(SCRATCH_BUF_LEN, 0);
-//
-//  /* Build key */
-//  snprintf(key->val, key->len,
-//           "%d.%06d",
-//           hp_globals.last_sample_time.tv_sec,
-//           hp_globals.last_sample_time.tv_usec);
-//
-//  /* Init stats in the global stats_count hashtable */
-//  hp_get_function_stack(*entries,
-//                        INT_MAX,
-//                        symbol
-//                        );
-//
-//  add_assoc_string(hp_globals.stats_count,
-//                   key->val,
-//                   symbol->val);
-//  return;
+  //char symbol[SCRATCH_BUF_LEN * 1000];
+  zend_string *symbol;
+  zend_string *key;
+  symbol = zend_string_alloc(SCRATCH_BUF_LEN * 1000, 0);
+  key = zend_string_alloc(20, 0);
+
+  /* Build key */
+  snprintf(key->val, key->len,
+           "%d.%06d",
+           hp_globals.last_sample_time.tv_sec,
+           hp_globals.last_sample_time.tv_usec);
+
+  /* Init stats in the global stats_count hashtable */
+  hp_get_function_stack(*entries,
+                        INT_MAX,
+                        symbol
+                        );
+
+  add_assoc_string(hp_globals.stats_count,
+                   key->val,
+                   symbol->val);
+  return;
 }
 
 /**
@@ -1879,7 +1880,9 @@ ZEND_DLEXPORT zend_op_array* hp_compile_file(zend_file_handle *file_handle,
   
   snprintf(func_name->val, len + 1, "load::%s", filename);
 
-  BEGIN_PROFILING(&hp_globals.entries, func_name, hp_profile_flag);
+  if (hp_globals.enabled == 1) {
+    BEGIN_PROFILING(&hp_globals.entries, func_name, hp_profile_flag);
+  }
   ret = _zend_compile_file(file_handle, type TSRMLS_CC);
   if (hp_globals.entries) {
     END_PROFILING(&hp_globals.entries, hp_profile_flag);
@@ -1934,7 +1937,7 @@ static void hp_begin(long level, long xhprof_flags TSRMLS_DC) {
 
     hp_globals.enabled      = 1;
     hp_globals.xhprof_flags = (uint32)xhprof_flags;
-    hp_init_profiler_state(level TSRMLS_CC);
+    
     
     /* Register the appropriate callback functions Override just a subset of
      * all the callbacks is OK. */
@@ -1949,6 +1952,9 @@ static void hp_begin(long level, long xhprof_flags TSRMLS_DC) {
         hp_globals.mode_cb.end_fn_cb   = hp_mode_sampled_endfn_cb;
         break;
     }
+    
+    hp_init_profiler_state(level TSRMLS_CC);
+    
     BEGIN_PROFILING(&hp_globals.entries, zend_string_init(ROOT_SYMBOL, sizeof(ROOT_SYMBOL) - 1, 1), hp_profile_flag);
     return;
 
