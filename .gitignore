@@ -14,3 +14,5 @@ extension/tests/*.php
 !extension/tests/common.php
 !extension/tests/xhprof_004_inc.php
 !extension/tests/xhprof_004_require.php
+!extension/tests/xhprof_010_append.php
+!extension/tests/xhprof_011_prepend.php
