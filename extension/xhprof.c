@@ -1798,7 +1798,8 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data, zval *re
 
   current_data = EG(current_execute_data);
   
-  if (hp_globals.xhprof_flags & XHPROF_FLAGS_NO_BUILTINS) {
+  if (!hp_globals.enabled
+      || hp_globals.xhprof_flags & XHPROF_FLAGS_NO_BUILTINS) {
     /* if NO_BUILTINS is not set (i.e. user wants to profile builtins),
      * then we intercept internal (builtin) function calls.
      */
@@ -1814,7 +1815,7 @@ ZEND_DLEXPORT void hp_execute_internal(zend_execute_data *execute_data, zval *re
   }
   
   func = current_data->func->op_array.function_name ;
-
+  
   //check is a class method
   if(current_data->func->op_array.scope != NULL) {
     zend_string *class_name = current_data->func->op_array.scope->name;
