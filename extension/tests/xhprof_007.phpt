@@ -144,7 +144,7 @@ echo "\n";
 // 5a: Sanity test ignoring my_call_user_func_array_safe and strcmp
 echo "Part 5a: Ignore my_call_user_func_array_safe and strcmp\n";
 $tmp1 = $xhprof_ignored_functions['ignored_functions'];
-$tmp1[] = 'strcmp';
+$tmp1['strcmp'] = true;
 $ignore_strcmp_also = array('ignored_functions' => $tmp1);
 xhprof_enable(XHPROF_FLAGS_MEMORY, $ignore_strcmp_also);
 test_my_call_user_func_array_safe('foo_array');
@@ -243,7 +243,6 @@ Part 5a: Ignore my_call_user_func_array_safe and strcmp
 hello: my_user_func_array_safetest
 Part 5a output:
 foo_array==>bar                         : ct=       2; mu=*; pmu=*; wt=*;
-foo_array==>strcmp                      : ct=       1; mu=*; pmu=*; wt=*;
 main()                                  : ct=       1; mu=*; pmu=*; wt=*;
 main()==>test_my_call_user_func_array_safe: ct=       1; mu=*; pmu=*; wt=*;
 main()==>xhprof_disable                 : ct=       1; mu=*; pmu=*; wt=*;
