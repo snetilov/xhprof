@@ -404,11 +404,19 @@ PHP_FUNCTION(xhprof_enable) {
   long  xhprof_flags = 0;                                    /* XHProf flags */
   zval *optional_array = NULL;         /* optional array arg: for future use */
 
+#if true
+  ZEND_PARSE_PARAMETERS_START(0, 2);
+    Z_PARAM_OPTIONAL;
+    Z_PARAM_LONG(&xhprof_flags);
+    Z_PARAM_ZVAL(&optional_array);
+  ZEND_PARSE_PARAMETERS_END();
+#else
   if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
                             "|lz", &xhprof_flags, &optional_array) == FAILURE) {
     return;
   }
-
+#endif
+  
   hp_get_ignored_functions_from_arg(optional_array);
 
   hp_begin(XHPROF_MODE_HIERARCHICAL, xhprof_flags TSRMLS_CC);
