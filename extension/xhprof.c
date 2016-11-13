@@ -309,7 +309,7 @@ static void hp_get_ignored_functions_from_arg(zval *args);
 static void hp_ignored_functions_filter_clear();
 static void hp_ignored_functions_filter_init();
 
-static inline zval  *hp_zval_at_key(char  *key,
+static inline zval  *hp_zval_at_key(zend_string  *key,
                                     zval  *values);
 //static inline char **hp_strings_in_zval(zval  *values);
 //static inline void   hp_array_del(char **name_array);
@@ -658,7 +658,9 @@ static void hp_get_ignored_functions_from_arg(zval *args) {
   if (args != NULL) {
     zval  *zresult = NULL;
 
-    zresult = hp_zval_at_key("ignored_functions", args);
+    zend_string *ignored_functions = zend_string_init("ignored_functions", strlen("ignored_functions"), 0);
+    zresult = hp_zval_at_key(ignored_functions, args);
+    zend_string_release(ignored_functions);
     if (zresult && Z_TYPE_P(zresult) == IS_ARRAY) {
       hp_globals.ignored_function_names = Z_ARRVAL_P(zresult);
     } else if (zresult && Z_TYPE_P(zresult) == IS_STRING) {
@@ -2070,17 +2072,16 @@ static void hp_stop(TSRMLS_D) {
  *
  *  @author mpal
  **/
-static zval *hp_zval_at_key(char  *key,
+static zval *hp_zval_at_key(zend_string  *key,
                             zval  *values) {
   zval *result = NULL;
 
   if (Z_TYPE_P(values) == IS_ARRAY) {
     HashTable *ht;
     zval      *value;
-    uint      len = strlen(key);
 
     ht = Z_ARRVAL_P(values);
-    if (value = zend_hash_str_find(ht, key, len)) {
+    if (value = zend_hash_find(ht, key)) {
       result = value;
     }
   } else {
