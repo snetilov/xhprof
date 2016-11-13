@@ -1899,7 +1899,7 @@ ZEND_DLEXPORT zend_op_array* hp_compile_file(zend_file_handle *file_handle,
   filename = hp_get_base_filename(file_handle->filename);
   len      = strlen("load::") + strlen(filename);
 
-  func_name = zend_string_init(filename, len, 0); 
+  func_name = zend_string_alloc(len, 0); 
   
   snprintf(func_name->val, len + 1, "load::%s", filename);
 
