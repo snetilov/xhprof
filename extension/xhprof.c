@@ -1089,6 +1089,7 @@ static void hp_free_the_free_list() {
   while (p) {
     cur = p;
     p = p->prev_hprof;
+    zend_string_release(cur->name_hprof);
     free(cur);
   }
 }
