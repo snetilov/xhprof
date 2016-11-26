@@ -1019,7 +1019,7 @@ static void hp_free_the_free_list() {
   while (p) {
     cur = p;
     p = p->prev_hprof;
-    //zend_string_release(cur->name_hprof);
+    zend_string_release(cur->name_hprof);
     free(cur);
   }
 }
@@ -1906,7 +1906,8 @@ static void hp_begin(long level, long xhprof_flags TSRMLS_DC) {
     
     hp_init_profiler_state(level TSRMLS_CC);
     
-    BEGIN_PROFILING(&hp_globals.entries, zend_string_init(ROOT_SYMBOL, sizeof(ROOT_SYMBOL) - 1, 1), hp_profile_flag);
+    zend_string *root_symbol = zend_string_init(ROOT_SYMBOL, sizeof(ROOT_SYMBOL) - 1, 1);
+    BEGIN_PROFILING(&hp_globals.entries, root_symbol, hp_profile_flag);
     return;
   }
 }
