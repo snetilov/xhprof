@@ -1585,11 +1585,11 @@ zval * hp_mode_shared_endfn_cb(hp_entry_t *top,
   }
 
   /* Bump stats in the counts hashtable */
-  zend_string *ct = zend_string_init("ct", sizeof("ct") - 1, 1);
+  zend_string *ct = zend_string_init("ct", sizeof("ct") - 1, 0);
   hp_inc_count(countsp, ct, 1  TSRMLS_CC);
   zend_string_release(ct);
 
-  zend_string *wt = zend_string_init("wt", sizeof("wt") - 1, 1);
+  zend_string *wt = zend_string_init("wt", sizeof("wt") - 1, 0);
   hp_inc_count(countsp, wt, get_us_from_tsc(tsc_end - top->tsc_start,
         hp_globals.cpu_frequencies[hp_globals.cur_cpu_id]) TSRMLS_CC);
   zend_string_release(wt);
@@ -1631,7 +1631,7 @@ void hp_mode_hier_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
     getrusage(RUSAGE_SELF, &ru_end);
 
     /* Bump CPU stats in the counts hashtable */
-    zend_string *cpu = zend_string_init("cpu", sizeof("cpu") - 1, 1);
+    zend_string *cpu = zend_string_init("cpu", sizeof("cpu") - 1, 0);
     hp_inc_count(counts, cpu, (get_us_interval(&(top->ru_start_hprof.ru_utime),
                                               &(ru_end.ru_utime)) +
                               get_us_interval(&(top->ru_start_hprof.ru_stime),
@@ -1646,11 +1646,11 @@ void hp_mode_hier_endfn_cb(hp_entry_t **entries  TSRMLS_DC) {
     pmu_end = zend_memory_peak_usage(0 TSRMLS_CC);
 
     /* Bump Memory stats in the counts hashtable */
-    zend_string *mu = zend_string_init("mu", sizeof("mu") - 1, 1);
+    zend_string *mu = zend_string_init("mu", sizeof("mu") - 1, 0);
     hp_inc_count(counts, mu,  mu_end - top->mu_start_hprof    TSRMLS_CC);
     zend_string_release(mu);
     
-    zend_string *pmu = zend_string_init("pmu", sizeof("pmu") - 1, 1);
+    zend_string *pmu = zend_string_init("pmu", sizeof("pmu") - 1, 0);
     hp_inc_count(counts, pmu, pmu_end - top->pmu_start_hprof  TSRMLS_CC);
     zend_string_release(pmu);
   }
