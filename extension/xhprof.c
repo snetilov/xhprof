@@ -1714,6 +1714,8 @@ ZEND_DLEXPORT void hp_execute_ex (zend_execute_data *execute_data TSRMLS_DC) {
     int run_init_len = sizeof("run_init::") - 1;
     func = zend_string_init("run_init::", run_init_len + filename->len, 0); 
     memcpy(func->val + run_init_len, filename->val, filename->len);
+    
+    zend_string_release(filename);
   }
 
   if (!func || hp_globals.enabled == 0) {
