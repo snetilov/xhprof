@@ -10,7 +10,7 @@ $old = memory_get_usage();
 // deallocated properly after a new call to xhprof_enable().
 
 $large = str_repeat('x', (1024 * 1024 * 16));
-xhprof_enable(0, array('ignored_functions' => array($large)));
+xhprof_enable(0, array('ignored_functions' => array($large => true)));
 xhprof_disable();
 unset($large);
 
