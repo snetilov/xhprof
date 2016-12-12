@@ -1085,43 +1085,11 @@ void hp_inc_count(zval *counts, zend_string *name, long count TSRMLS_DC) {
      
     //ZVAL_LONG(data, count);
     //zend_hash_update(ht, name, data);
-
+    
     add_assoc_long(counts, name->val, count);
   }
 }
 
-/**
- * Looksup the hash table for the given symbol
- * Initializes a new array() if symbol is not present
- *
- * @author kannan, veeve
- */
-//zval * hp_hash_lookup(zend_string *symbol  TSRMLS_DC) {
-//  HashTable   *ht;
-//  zval        *data;
-//  zval        counts;
-//
-//  /* Bail if something is goofy */
-//  if (!hp_globals.stats_count || !(ht = HASH_OF(hp_globals.stats_count))) {
-//    return (zval *) 0;
-//  }
-//
-//  /* Lookup our hash table */
-//  //zend_hash_str_find
-//  if ((data = zend_hash_str_find(ht, symbol->val, strlen(symbol->val))) != NULL) {
-//    /* Symbol already exists */
-//    counts = data;
-//  }
-//  else {
-//    /* Add symbol to hash table */
-//   // MAKE_STD_ZVAL(counts);
-//    //counts = (zval *)emalloc(sizeof(zval));
-//    array_init(&counts);
-//    add_assoc_zval(hp_globals.stats_count, symbol->val, &counts);
-//  }
-//  
-//  return (counts);
-//}
 
 /**
  * Sample the stack. Add it to the stats_count global.
