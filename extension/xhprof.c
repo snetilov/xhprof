@@ -107,8 +107,6 @@
 
 /* Constant for ignoring functions, transparent to hierarchical profile */
 #define XHPROF_MAX_IGNORED_FUNCTIONS  256
-#define XHPROF_IGNORED_FUNCTION_FILTER_SIZE                           \
-               ((XHPROF_MAX_IGNORED_FUNCTIONS + 7)/8)
 
 #if !defined(uint64)
 typedef unsigned long long uint64;
@@ -226,7 +224,6 @@ typedef struct hp_global_t {
 
   /* Table of ignored function names and their filter */
   HashTable *ignored_function_names;
-  uint8   ignored_function_filter[XHPROF_IGNORED_FUNCTION_FILTER_SIZE];
 
 } hp_global_t;
 
