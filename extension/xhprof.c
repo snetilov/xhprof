@@ -388,7 +388,7 @@ PHP_FUNCTION(xhprof_enable) {
   ZEND_PARSE_PARAMETERS_START(0, 2);
     Z_PARAM_OPTIONAL;
     Z_PARAM_LONG(xhprof_flags);
-    Z_PARAM_ZVAL(optional_array);
+    Z_PARAM_ARRAY(optional_array);
   ZEND_PARSE_PARAMETERS_END();
 #else
   if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC,
@@ -398,6 +398,11 @@ PHP_FUNCTION(xhprof_enable) {
 #endif
   
   hp_get_ignored_functions_from_arg(optional_array);
+
+  //if (optional_array != NULL && zend_hash_num_elements(Z_ARRVAL_P(optional_array)) > 0) {
+    // Fixes test12 breaks test07
+    //zval_ptr_dtor(optional_array);
+  //}
 
   hp_begin(XHPROF_MODE_HIERARCHICAL, xhprof_flags TSRMLS_CC);
 }
@@ -413,6 +418,13 @@ PHP_FUNCTION(xhprof_enable) {
 PHP_FUNCTION(xhprof_disable) {
   if (hp_globals.enabled) {
     hp_stop(TSRMLS_C);
+    
+    if (hp_globals.ignored_function_names != NULL) {
+        zend_hash_destroy(hp_globals.ignored_function_names);
+        FREE_HASHTABLE(hp_globals.ignored_function_names);
+        hp_globals.ignored_function_names = NULL;
+    }
+    
     RETURN_ZVAL(hp_globals.stats_count, 1, 0);
   }
   /* else null is returned */
@@ -643,7 +655,7 @@ static void hp_get_ignored_functions_from_arg(zval *args) {
     
     zend_string_release(ignored_functions);
     if (zresult && Z_TYPE_P(zresult) == IS_ARRAY) {
-      hp_globals.ignored_function_names = Z_ARRVAL_P(zresult);
+      hp_globals.ignored_function_names = zend_array_dup(Z_ARRVAL_P(zresult));
     } else if (zresult && Z_TYPE_P(zresult) == IS_STRING) {
         //zend_hash_init(hp_globals.ignored_function_names, 0, NULL, NULL, 0);
         //zend_hash_add(hp_globals.ignored_function_names, Z_STR_P(zresult), ZVAL_TRUE(IS_TRUE));
@@ -712,8 +724,6 @@ void hp_clean_profiler_state(TSRMLS_D) {
   hp_globals.entries = NULL;
   hp_globals.profiler_level = 1;
   hp_globals.ever_enabled = 0;
-
-  //hp_globals.ignored_function_names = NULL;
 }
 
 /*
@@ -1914,5 +1924,4 @@ static void hp_stop(TSRMLS_D) {
 
   /* Stop profiling */
   hp_globals.enabled = 0;
-  hp_globals.ignored_function_names = NULL;
 }
