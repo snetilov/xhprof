@@ -588,6 +588,14 @@ PHP_MINFO_FUNCTION(xhprof)
   buf[len] = 0;
   php_info_print_table_header(2, "CPU num", buf);
 
+  /* NOTE(cjiang): some fields such as cpu_frequencies take relatively longer
+   * to initialize, (5 milisecond per logical cpu right now), therefore we
+   * calculate them lazily. */
+  if (hp_globals.cpu_frequencies == NULL) {
+    get_all_cpu_frequencies();
+    restore_cpu_affinity(&hp_globals.prev_mask);
+  }
+  
   if (hp_globals.cpu_frequencies) {
     /* Print available cpu frequencies here. */
     php_info_print_table_header(2, "CPU logical id", " Clock Rate (MHz) ");
@@ -600,6 +608,8 @@ PHP_MINFO_FUNCTION(xhprof)
     }
   }
 
+  clear_frequencies();
+  
   php_info_print_table_end();
 }
 
