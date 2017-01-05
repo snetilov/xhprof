@@ -1143,7 +1143,7 @@ void hp_sample_stack(hp_entry_t  **entries  TSRMLS_DC) {
                    symbol->val);
   
   //zend_string_release(symbol);
-  //zend_string_release(key);
+  zend_string_release(key);
   
   return;
 }
