@@ -690,12 +690,14 @@ void hp_init_profiler_state(int level TSRMLS_DC) {
   }
   hp_globals.profiler_level  = (int) level;
 
-  /* Init stats_count */
+  /* Destroy stats_count */
   if (hp_globals.stats_count) {
-    //zval_dtor(hp_globals.stats_count);
+    zval_ptr_dtor(hp_globals.stats_count);
     efree(hp_globals.stats_count);
+    hp_globals.stats_count = NULL;
   }
   
+  /* Init stats_count */
   hp_globals.stats_count = (zval *)emalloc(sizeof(zval));
   array_init(hp_globals.stats_count);
 
