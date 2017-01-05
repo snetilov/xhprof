@@ -1124,6 +1124,7 @@ void hp_sample_stack(hp_entry_t  **entries  TSRMLS_DC) {
   zend_string *symbol;
   zend_string *key;
   symbol = zend_string_alloc(SCRATCH_BUF_LEN * 1000, 0);
+  ZSTR_VAL(symbol)[0] = '\000';
   key = zend_string_alloc(20, 0);
 
   /* Build key */
@@ -1142,7 +1143,7 @@ void hp_sample_stack(hp_entry_t  **entries  TSRMLS_DC) {
                    key->val,
                    symbol->val);
   
-  //zend_string_release(symbol);
+  zend_string_release(symbol);
   zend_string_release(key);
   
   return;
