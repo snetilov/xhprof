@@ -590,25 +590,21 @@ function pct($a, $b) {
  * and red for regression deltas.
  */
 function get_print_class($num, $bold) {
-  global $vbar;
-  global $vbbar;
-  global $vrbar;
-  global $vgbar;
   global $diff_mode;
 
   if ($bold) {
     if ($diff_mode) {
       if ($num <= 0) {
-        $class = $vgbar; // green (improvement)
+        $class = ' class="vgbar"'; // green (improvement)
       } else {
-        $class = $vrbar; // red (regression)
+        $class = ' class="vrbar"'; // red (regression)
       }
     } else {
-      $class = $vbbar; // blue
+      $class = 'class="vbbar"'; // blue
     }
   }
   else {
-    $class = $vbar;  // default (black)
+    $class = ' class="vbar"';  // default (black)
   }
 
   return $class;
@@ -632,10 +628,6 @@ function print_td_num($num, $fmt_func, $bold=false, $attributes=null) {
  * Prints a <td> element with a pecentage.
  */
 function print_td_pct($numer, $denom, $bold=false, $attributes=null) {
-  global $vbar;
-  global $vbbar;
-  global $diff_mode;
-
   $class = get_print_class($numer, $bold);
 
   if ($denom == 0) {
@@ -716,7 +708,6 @@ function print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $
 
   global $stats;
   global $sortable_columns;
-  global $vwbar;
   global $base_path;
 
   $size  = count($flat_data);
@@ -748,7 +739,7 @@ function print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $
 
     if ($stat == "fn")
       print("<th align=left><nobr>$header</th>");
-    else print("<th " . $vwbar . "><nobr>$header</th>");
+    else print('<th class="vwbar">'."<nobr>$header</th>");
   }
   print("</tr>\n");
 
@@ -779,8 +770,6 @@ function print_flat_data($url_params, $title, $flat_data, $sort, $run1, $run2, $
  * @author Kannan
  */
 function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
-  global $vwbar;
-  global $vbar;
   global $totals;
   global $totals_1;
   global $totals_2;
@@ -811,10 +800,10 @@ function full_report($url_params, $symbol_tab, $sort, $run1, $run2) {
           .'rules=rows bordercolor="#bdc7d8" align=center>' . "\n");
     print('<tr bgcolor="#bdc7d8" align=right>');
     print("<th></th>");
-    print("<th $vwbar>" . xhprof_render_link("Run #$run1", $href1) . "</th>");
-    print("<th $vwbar>" . xhprof_render_link("Run #$run2", $href2) . "</th>");
-    print("<th $vwbar>Diff</th>");
-    print("<th $vwbar>Diff%</th>");
+    print('<th class="vwbar">' . xhprof_render_link("Run #$run1", $href1) . "</th>");
+    print('<th class="vwbar">' . xhprof_render_link("Run #$run2", $href2) . "</th>");
+    print('<th class="vwbar">Diff</th>');
+    print('<th class="vwbar">Diff%</th>');
     print('</tr>');
 
     if ($display_calls) {
@@ -1039,8 +1028,6 @@ function symbol_report($url_params,
                        $symbol_info1 = null,
                        $run2 = 0,
                        $symbol_info2 = null) {
-  global $vwbar;
-  global $vbar;
   global $totals;
   global $pc_stats;
   global $sortable_columns;
@@ -1077,10 +1064,10 @@ function symbol_report($url_params,
           .'rules=rows bordercolor="#bdc7d8" align=center>' . "\n");
     print('<tr bgcolor="#bdc7d8" align=right>');
     print("<th align=left>$rep_symbol</th>");
-    print("<th $vwbar><a href=" . $href1 . ">Run #$run1</a></th>");
-    print("<th $vwbar><a href=" . $href2 . ">Run #$run2</a></th>");
-    print("<th $vwbar>Diff</th>");
-    print("<th $vwbar>Diff%</th>");
+    print('<th class="vwbar"><a href=' . $href1 . ">Run #$run1</a></th>");
+    print('<th class="vwbar"><a href=' . $href2 . ">Run #$run2</a></th>");
+    print('<th class="vwbar">Diff</th>');
+    print('<th class="vwbar">Diff%</th>');
     print('</tr>');
     print('<tr>');
 
@@ -1167,7 +1154,7 @@ function symbol_report($url_params,
 
     if ($stat == "fn")
       print("<th align=left><nobr>$header</th>");
-    else print("<th " . $vwbar . "><nobr>$header</th>");
+    else print('<th class="vwbar">'."<nobr>$header</th>");
   }
   print("</tr>");
 
@@ -1200,8 +1187,8 @@ function symbol_report($url_params,
 
   if ($display_calls) {
     // Call Count
-    print("<td $vbar></td>");
-    print("<td $vbar></td>");
+    print('<td class="vbar"></td>');
+    print('<td class="vbar"></td>');
   }
 
   // Exclusive Metrics for current function

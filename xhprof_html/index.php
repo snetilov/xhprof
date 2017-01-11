@@ -73,13 +73,6 @@ echo "</head>";
 
 echo "<body>";
 
-$vbar  = ' class="vbar"';
-$vwbar = ' class="vwbar"';
-$vwlbar = ' class="vwlbar"';
-$vbbar = ' class="vbbar"';
-$vrbar = ' class="vrbar"';
-$vgbar = ' class="vgbar"';
-
 $xhprof_runs_impl = new XHProfRuns_Default();
 
 displayXHProfReport($xhprof_runs_impl, $params, $source, $run, $wts,
