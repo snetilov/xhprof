@@ -554,13 +554,13 @@ your web server is setup to serve PHP scripts.
 
 <p>Clients have flexibility in how they save the XHProf raw data
 obtained from an XHProf run. The XHProf UI layer exposes an interface
-iXHProfRuns (see xhprof_lib/utils/xhprof_runs.php) that clients can
+iXHProfRuns (see xhprof_lib/utils/XHProfRuns_Default.php) that clients can
 implement. This allows the clients to tell the UI layer how to fetch
 the data corresponding to a XHProf run.
 
 <p>The XHProf UI libaries come with a default file based
 implementation of the iXHProfRuns interface, namely
-"XHProfRuns_Default" (also in xhprof_lib/utils/xhprof_runs.php).
+"XHProfRuns_Default" (also in xhprof_lib/utils/XHProfRuns_Default.php).
 This default implementation stores runs in the directory specified by
 <a href="#ini_file"><b>xhprof.output_dir</b></a> INI parameter.
 
@@ -592,7 +592,7 @@ $xhprof_data = xhprof_disable();
 // using the default implementation of iXHProfRuns.
 //
 include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_lib.php";
-include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_runs.php";
+include_once $XHPROF_ROOT . "/xhprof_lib/utils/XHProfRuns_Default.php";
 
 $xhprof_runs = new <b>XHProfRuns_Default()</b>;
 

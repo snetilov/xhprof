@@ -35,7 +35,7 @@ if (!isset($GLOBALS['XHPROF_LIB_ROOT'])) {
 
 require_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/xhprof_lib.php';
 require_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/callgraph_utils.php';
-require_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/xhprof_runs.php';
+require_once $GLOBALS['XHPROF_LIB_ROOT'].'/utils/XHProfRuns_Default.php';
 
 
 /**

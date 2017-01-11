@@ -132,7 +132,8 @@ XHProf is a function-level hierarchical profiler for PHP and has a simple HTML b
       <dir name="utils">
         <file role="php" name="callgraph_utils.php"/>
         <file role="php" name="xhprof_lib.php"/>
-        <file role="php" name="xhprof_runs.php"/>
+        <file role="php" name="XHProfRuns_Default.php"/>
+        <file role="php" name="XHProfRunsInterface.php"/>
       </dir>
     </dir>
   </dir> <!-- / -->

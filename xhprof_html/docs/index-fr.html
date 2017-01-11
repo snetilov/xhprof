@@ -495,11 +495,11 @@ xhprof_enable(XHPROF_FLAGS_MEMORY,
 <li><p><b>Gérer les runs XHProf</b>
 
 <p>Les clients web ont une certaine souplesse dans la manière de sauvegarder les données brutes fournies par XHProf. 
-XHProf expose une interface utilisateur nommée iXHProfRuns (voir xhprof_lib/utils/xhprof_runs.php) que les clients peuvent implémenter. 
+XHProf expose une interface utilisateur nommée iXHProfRuns (voir xhprof_lib/utils/XHProfRuns_Default.php) que les clients peuvent implémenter.
 Cela permet aux clients de préciser comment afficher les donées des runs.
 
 <p>L’interface utilisateur d’XHProf fournit une implementation par défaut nommée, 
-"XHProfRuns_Default" (aussi dans xhprof_lib/utils/xhprof_runs.php).
+"XHProfRuns_Default" (aussi dans xhprof_lib/utils/XHProfRuns_Default.php).
 L’implementation par d"faut stocke les runs dans le répertoire définit par le paramètre INI :  
 <a href="#ini_file"><b>xhprof.output_dir</b></a>.
 
@@ -527,7 +527,7 @@ $xhprof_data = xhprof_disable();
 // en utilisant l’implementation par défaut de iXHProfRuns.
 //
 include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_lib.php";
-include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_runs.php";
+include_once $XHPROF_ROOT . "/xhprof_lib/utils/XHProfRuns_Default.php";
 
 $xhprof_runs = new <b>XHProfRuns_Default()</b>;
 

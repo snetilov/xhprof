@@ -42,7 +42,7 @@ print_r($xhprof_data);
 
 $XHPROF_ROOT = realpath(dirname(__FILE__) .'/..');
 include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_lib.php";
-include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_runs.php";
+include_once $XHPROF_ROOT . "/xhprof_lib/utils/XHProfRuns_Default.php";
 
 // save raw data for this profiler run using default
 // implementation of iXHProfRuns.
