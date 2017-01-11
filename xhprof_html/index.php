@@ -68,8 +68,17 @@ foreach ($params as $k => $v) {
 echo "<html>";
 
 echo "<head><title>XHProf: Hierarchical Profiler Report</title>";
-xhprof_include_js_css();
-echo "</head>";
+// style sheets
+echo '<link href="/css/xhprof.css" rel="stylesheet" type="text/css" />';
+echo '<link href="/jquery/jquery.tooltip.css" rel="stylesheet" type="text/css" />';
+echo '<link href="/jquery/jquery.autocomplete.css" rel="stylesheet" type="text/css" />';
+
+// javascript
+echo '<script src="/jquery/jquery-1.2.6.js"></script>';
+echo '<script src="/jquery/jquery.tooltip.js"></script>';
+echo '<script src="/jquery/jquery.autocomplete.js"></script>';
+echo '<script src="/js/xhprof_report.js"></script>';
+echo '</head>';
 
 echo "<body>";
 
