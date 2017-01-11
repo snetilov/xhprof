@@ -36,7 +36,7 @@ class XHProfRuns_Default implements XHProfRunsInterface {
   private $dir = '';
   private $suffix = 'xhprof';
 
-  private function gen_run_id($type) {
+  private function gen_run_id() {
     return uniqid();
   }
 
@@ -94,7 +94,7 @@ class XHProfRuns_Default implements XHProfRunsInterface {
     $xhprof_data = serialize($xhprof_data);
 
     if ($run_id === null) {
-      $run_id = $this->gen_run_id($type);
+      $run_id = $this->gen_run_id();
     }
 
     $file_name = $this->file_name($run_id, $type);
